@@ -7,6 +7,7 @@ import org.samples.trading.domain.OrderbookFactory
 import akka.actor.Actor._
 import akka.actor.ActorRef
 import akka.dispatch.MessageDispatcher
+import akka.dispatch.Dispatchers
 
 class AkkaTradingSystem extends TradingSystem {
   type ME = ActorRef
@@ -17,7 +18,15 @@ class AkkaTradingSystem extends TradingSystem {
 
   // by default we use default-dispatcher that is defined in akka.conf
 
-  def createOrderReceiverDispatcher: Option[MessageDispatcher] = None
+  //def createOrderReceiverDispatcher: Option[MessageDispatcher] = None
+  def createOrderReceiverDispatcher: Option[MessageDispatcher] = {
+    val dispatcher = Dispatchers.newExecutorBasedEventDrivenDispatcher("or-dispatcher")
+      .withNewThreadPoolWithLinkedBlockingQueueWithUnboundedCapacity
+      .setCorePoolSize(1)
+      .setMaxPoolSize(1)
+      .build;
+    Option(dispatcher)
+  }
 
   // by default we use default-dispatcher that is defined in akka.conf
 
